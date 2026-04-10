@@ -26,13 +26,14 @@ class Quiz
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
-    private Collection $questions;
+    private Collection $question;
 
     public function __construct()
     {
-        $this->questions = new ArrayCollection();
+        $this->question = new ArrayCollection();
     }
 
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -65,15 +66,15 @@ class Quiz
     /**
      * @return Collection<int, Question>
      */
-    public function getQuestions(): Collection
+    public function getQuestion(): Collection
     {
-        return $this->questions;
+        return $this->question;
     }
 
     public function addQuestion(Question $question): static
     {
-        if (!$this->questions->contains($question)) {
-            $this->questions->add($question);
+        if (!$this->question->contains($question)) {
+            $this->question->add($question);
             $question->setQuiz($this);
         }
 
@@ -82,7 +83,7 @@ class Quiz
 
     public function removeQuestion(Question $question): static
     {
-        if ($this->questions->removeElement($question)) {
+        if ($this->question->removeElement($question)) {
             // set the owning side to null (unless already changed)
             if ($question->getQuiz() === $this) {
                 $question->setQuiz(null);
@@ -91,4 +92,5 @@ class Quiz
 
         return $this;
     }
+
 }
