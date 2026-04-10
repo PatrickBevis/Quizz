@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -23,6 +25,17 @@ class User implements UserInterface
      */
     #[ORM\Column]
     private array $roles = [];
+
+    /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\ManyToMany(targetEntity: Quiz::class, inversedBy: 'users')]
+    private Collection $quiz;
+
+    public function __construct()
+    {
+        $this->quiz = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -77,5 +90,29 @@ class User implements UserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuiz(): Collection
+    {
+        return $this->quiz;
+    }
+
+    public function addQuiz(Quiz $quiz): static
+    {
+        if (!$this->quiz->contains($quiz)) {
+            $this->quiz->add($quiz);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        $this->quiz->removeElement($quiz);
+
+        return $this;
     }
 }

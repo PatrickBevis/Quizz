@@ -28,9 +28,19 @@ class Quiz
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
     private Collection $question;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'quiz')]
+    private Collection $users;
+
+    #[ORM\Column]
+    private ?bool $isFinal = null;
+
     public function __construct()
     {
         $this->question = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     
@@ -89,6 +99,45 @@ class Quiz
                 $question->setQuiz(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addQuiz($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeQuiz($this);
+        }
+
+        return $this;
+    }
+
+    public function isFinal(): ?bool
+    {
+        return $this->isFinal;
+    }
+
+    public function setIsFinal(bool $isFinal): static
+    {
+        $this->isFinal = $isFinal;
 
         return $this;
     }
