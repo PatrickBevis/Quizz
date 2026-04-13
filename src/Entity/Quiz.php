@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
 class Quiz
@@ -14,24 +15,29 @@ class Quiz
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["quiz:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $title = null;
+    #[Groups(["quiz:read"])]
+    private ?string $theme = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["quiz:read"])]
     private ?string $description = null;
 
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
-    private Collection $question;
+    #[Groups(["quiz:read"])]
+    private Collection $questions;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'quiz')]
+    
     private Collection $users;
 
     #[ORM\Column]
@@ -39,7 +45,7 @@ class Quiz
 
     public function __construct()
     {
-        $this->question = new ArrayCollection();
+        $this->questions = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 
@@ -49,14 +55,14 @@ class Quiz
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTheme(): ?string
     {
-        return $this->title;
+        return $this->theme;
     }
 
-    public function setTitle(string $title): static
+    public function setTheme(string $theme): static
     {
-        $this->title = $title;
+        $this->theme= $theme;
 
         return $this;
     }
@@ -76,15 +82,15 @@ class Quiz
     /**
      * @return Collection<int, Question>
      */
-    public function getQuestion(): Collection
+    public function getQuestions(): Collection
     {
-        return $this->question;
+        return $this->questions;
     }
 
     public function addQuestion(Question $question): static
     {
-        if (!$this->question->contains($question)) {
-            $this->question->add($question);
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
             $question->setQuiz($this);
         }
 
@@ -93,7 +99,7 @@ class Quiz
 
     public function removeQuestion(Question $question): static
     {
-        if ($this->question->removeElement($question)) {
+        if ($this->questions->removeElement($question)) {
             // set the owning side to null (unless already changed)
             if ($question->getQuiz() === $this) {
                 $question->setQuiz(null);
