@@ -18,11 +18,9 @@ class AppFixtures extends Fixture
         $user->setRoles(["ROLE_USER"]);
         $manager->persist($user);
 
-        $listQuestion = [];
-        $listAnswer =[];
 
         $quiz1 = new Quiz();
-        $quiz1->setTitle('Movie');
+        $quiz1->setTheme('Movie');
         $quiz1->setDescription('Simple questions for everyone');
         $quiz1->setIsFinal(false);
         $manager->persist($quiz1);
@@ -31,6 +29,7 @@ class AppFixtures extends Fixture
         $question1->setDescription('Who is Luke Skywalkers Dad');
         $question1->setQuiz($quiz1);
         $manager->persist($question1);
+
          $answers1 = [
             ['Anakin Skywalker', true],
             ['Yoda', false],
