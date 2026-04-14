@@ -3,30 +3,79 @@
 namespace App\Controller;
 
 use App\Entity\Answer;
+use App\Form\AnswerType;
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
+#[Route('/answer')]
 final class AnswerController extends AbstractController
 {
-    #[Route('/api/answers', name: 'answers', methods:['GET'])]
-    public function getallAnswer(AnswerRepository $answerRepository, SerializerInterface $serializer): JsonResponse
+    #[Route(name: 'app_answer_index', methods: ['GET'])]
+    public function index(AnswerRepository $answerRepository): Response
     {
-        $answerList = $answerRepository->findAll();
-        $jsonAnswerList= $serializer->serialize($answerList, 'json',['groups' => 'answer:read']);
-        return new JsonResponse($jsonAnswerList, Response::HTTP_OK, [], true);
+        return $this->render('answer/index.html.twig', [
+            'answers' => $answerRepository->findAll(),
+        ]);
+    }
 
+    #[Route('/new', name: 'app_answer_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $answer = new Answer();
+        $form = $this->createForm(AnswerType::class, $answer);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($answer);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_answer_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('answer/new.html.twig', [
+            'answer' => $answer,
+            'form' => $form,
+        ]);
     }
-    
-    #[Route('/api/answers/{id}', name: 'deleteAnswer', methods:['DELETE'])]
-    public function deleteAnswer(Answer $answer, EntityManagerInterface $em) :JsonResponse {
-        $em->remove($answer);
-        $em->flush;
-        return new JsonResponse(['message' => $answer->getLabel() .  ' has been deleted'], Response::HTTP_OK);
+
+    #[Route('/{id}', name: 'app_answer_show', methods: ['GET'])]
+    public function show(Answer $answer): Response
+    {
+        return $this->render('answer/show.html.twig', [
+            'answer' => $answer,
+        ]);
     }
-    
+
+    #[Route('/{id}/edit', name: 'app_answer_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Answer $answer, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(AnswerType::class, $answer);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_answer_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('answer/edit.html.twig', [
+            'answer' => $answer,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_answer_delete', methods: ['POST'])]
+    public function delete(Request $request, Answer $answer, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$answer->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($answer);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_answer_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
