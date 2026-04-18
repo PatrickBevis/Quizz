@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pseudo{% endblock %}
+
+{% block body %}
+    <h1 class="text-5xl p-20 text-center text-violet-400 font-bold">
+        Rentrez le pseudo pour commencer
+    </h1>
+
+    <div class="flex justify-center">
+        <div class="w-full max-w-md bg-white border rounded-lg p-8 text-xl">
+
+            <form method="post" action="{{ path('app_login') }}" class="space-y-6">
+
+                <div>
+                    <label for="pseudo" class="block mb-2 font-bold text-violet-700">
+                        Pseudo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="pseudo"
+                        id="pseudo"
+                        class="w-full bg-gray-800 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-400"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div class="text-right pt-4">
+                    <button
+                        type="submit"
+                        class="btn bg-violet-700 text-white border px-6 py-2 font-bold hover:cursor-pointer"
+                    >
+                        Commencer
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

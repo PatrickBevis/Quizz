@@ -32,6 +32,9 @@ class User implements UserInterface
     #[ORM\ManyToMany(targetEntity: Quiz::class, inversedBy: 'users')]
     private Collection $quiz;
 
+    #[ORM\Column]
+    private ?int $score = null;
+
     public function __construct()
     {
         $this->quiz = new ArrayCollection();
@@ -112,6 +115,18 @@ class User implements UserInterface
     public function removeQuiz(Quiz $quiz): static
     {
         $this->quiz->removeElement($quiz);
+
+        return $this;
+    }
+
+    public function getScore(): ?int
+    {
+        return $this->score;
+    }
+
+    public function setScore(int $score): static
+    {
+        $this->score = $score;
 
         return $this;
     }
