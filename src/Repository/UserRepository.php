@@ -40,4 +40,11 @@ class UserRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+          public function findByScoreAsc(): array
+          {
+            return $this->createQueryBuilder('u')
+            ->orderBy('u.score', 'ASC')
+            ->getQuery()
+            ->getResult();
+          }
 }
